@@ -1,17 +1,20 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-import qrcode, json, io, mysql.connector, random as r, smtplib
+import qrcode, json, io, random as r, smtplib
 from email.message import EmailMessage
+import mysql.connector
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"
+app.secret_key = "supersecretkey"  # Move to env var in production
 
 # ---------------- MySQL config ----------------
+# Use your PC public IP or DDNS here
 db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "",
-    "database": "MigrantCarePlus"
+    "host": "121.200.51.86",
+    "user": "Ghost",
+    "password": "user@server",
+    "database": "MigrantCarePlus",
+    "port": 3306
 }
 
 def get_db_connection():
@@ -26,7 +29,7 @@ def send_otp_email(to_mail, purpose="Verification"):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     from_mail = 'migrantcareplus@gmail.com'
-    server.login(from_mail, 'afmi mliz abwv vuqi')  # use env variable in prod
+    server.login(from_mail, 'afmi mliz abwv vuqi')  # Use env variable in production
 
     msg = EmailMessage()
     msg['Subject'] = f"{purpose} OTP"
@@ -62,7 +65,6 @@ def profile():
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        # Detect if the request is JSON (AJAX)
         if request.is_json:
             data = request.get_json()
             member_id = data.get('member_id')
@@ -80,17 +82,10 @@ def login():
 
         if user and check_password_hash(user['password'], password):
             session["user"] = member_id
-            if request.is_json:
-                return jsonify({"success": True})
-            else:
-                return redirect(url_for('profile'))
+            return jsonify({"success": True}) if request.is_json else redirect(url_for('profile'))
         else:
             msg = "Invalid Member ID or Password"
-            if request.is_json:
-                return jsonify({"success": False, "message": msg})
-            else:
-                # Pass the message to the template for normal form submission
-                return render_template('login.html', error_msg=msg)
+            return jsonify({"success": False, "message": msg}) if request.is_json else render_template('login.html', error_msg=msg)
 
     return render_template('login.html')
 
@@ -204,11 +199,9 @@ def create_account():
         email = request.form.get("email").strip().lower()
         otp_input = request.form.get("email_otp")
 
-        # Check OTP
         if otp_input != session.get("registration_otp") or email != session.get("registration_email"):
             return "❌ Invalid OTP. Please verify your email.", 400
 
-        # Check duplicate email
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("SELECT 1 FROM users WHERE LOWER(email) = %s LIMIT 1", (email,))
@@ -262,7 +255,6 @@ def create_account():
         cursor.close()
         conn.close()
 
-        # Clear OTP session
         session.pop("registration_otp", None)
         session.pop("registration_email", None)
 
@@ -285,4 +277,3 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
-
