@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Patient Health Report</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      background-color: #f4f6f8;
+    }
+
+    /* Sidebar (collapsed by default) */
+    .sidebar {
+      width: 60px; /* collapsed width */
+      background-color: #273849;
+      color: white;
+      height: 100vh;
+      padding: 20px 10px;
+      transition: width 0.3s ease;
+      overflow: hidden;
+      position: fixed;
+      left: 0;
+      top: 0;
+    }
+
+    /* Expand sidebar on hover */
+    .sidebar:hover {
+      width: 220px; /* expanded width */
+      padding: 20px;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 30px;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar:hover h2 {
+      opacity: 1;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      text-decoration: none;
+      margin: 15px 0;
+      white-space: nowrap;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .sidebar:hover a {
+      opacity: 1;
+    }
+
+    .main {
+      flex-grow: 1;
+      padding: 30px;
+      margin-left: 60px; /* same as collapsed sidebar width */
+      transition: margin-left 0.3s ease;
+    }
+    .sidebar:hover ~ .main {
+      margin-left: 220px; /* shift when sidebar expands */
+    }
+
+    .form-section {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .form-section h3 {
+      margin-bottom: 20px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], select, input[type="file"] {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    .submit-btn {
+      background-color: #e74c3c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 4px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="sidebar">
+    <h2>Report</h2>
+    <a href="#">Submitted records</a>
+    <a href="#">Settings</a>
+    <a href="{{ url_for('profile')}}">Back to profile</a>
+  </div>
+
+  <div class="main">
+    <div class="form-section">
+      <h3>Upload Patient Health Report</h3>
+      <form>
+        <div class="form-group">
+          <label for="patient-name">Patient Name</label>
+          <input type="text" id="patient-name" name="patient-name" placeholder="Enter patient name">
+        </div>
+        <div class="form-group">
+          <label for="report-type">Type of Report</label>
+          <select id="report-type" name="report-type">
+            <option value="">Select Report Type</option>
+            <option value="Blood Test">Blood Test</option>
+            <option value="X-Ray">X-Ray</option>
+            <option value="MRI">MRI</option>
+            <option value="Prescription">Prescription</option>
+            <option value="Discharge Summary">Discharge Summary</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="report-file">Upload Report (PDF or DOC, Max 10MB)</label>
+          <input type="file" id="report-file" name="report-file" accept=".pdf,.doc,.docx">
+        </div>
+        <button type="submit" class="submit-btn">Submit Report</button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>

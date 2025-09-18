@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Verify OTP</title>
+<style>
+  /* ---------- Global Reset ---------- */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  body {
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* ---------- Card Container ---------- */
+  .otp-card {
+    background: #ffffff;
+    padding: 40px 30px;
+    width: 100%;
+    max-width: 400px;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    text-align: center;
+    animation: fadeIn 0.6s ease;
+  }
+
+  h2 {
+    margin-bottom: 20px;
+    color: #333;
+    font-size: 1.6rem;
+  }
+
+  /* ---------- OTP Boxes ---------- */
+  .otp-inputs {
+    display: flex;
+    justify-content: space-between;
+    margin: 20px 0;
+    gap: 10px;
+  }
+
+  .otp-inputs input {
+    width: 45px;
+    height: 55px;
+    text-align: center;
+    font-size: 1.4rem;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    transition: border-color 0.3s;
+  }
+
+  .otp-inputs input:focus {
+    border-color: #4A90E2;
+    outline: none;
+  }
+
+  /* ---------- Button ---------- */
+  button {
+    background: #4A90E2;
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background 0.3s ease;
+    width: 100%;
+  }
+
+  button:hover {
+    background: #357ABD;
+  }
+
+  /* ---------- Link ---------- */
+  .back-link {
+    margin-top: 15px;
+    display: block;
+    text-decoration: none;
+    color: #4A90E2;
+    font-weight: 500;
+    transition: color 0.3s;
+  }
+
+  .back-link:hover {
+    color: #357ABD;
+  }
+
+  /* ---------- Animation ---------- */
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px);}
+    to   { opacity: 1; transform: translateY(0);}
+  }
+</style>
+</head>
+<body>
+  <div class="otp-card">
+    <h2>Enter the OTP sent to your email</h2>
+
+    <!-- OTP FORM -->
+    <form action="{{ url_for('verify_reset_otp') }}" method="post" id="otp-form">
+      <div class="otp-inputs">
+        <input type="text" maxlength="1" name="otp1" required>
+        <input type="text" maxlength="1" name="otp2" required>
+        <input type="text" maxlength="1" name="otp3" required>
+        <input type="text" maxlength="1" name="otp4" required>
+        <input type="text" maxlength="1" name="otp5" required>
+        <input type="text" maxlength="1" name="otp6" required>
+      </div>
+      <!-- hidden field to send combined OTP -->
+      <input type="hidden" name="otp" id="otp-hidden">
+      <button type="submit">Verify OTP</button>
+    </form>
+
+    <a class="back-link" href="{{ url_for('login') }}">← Back to Login</a>
+  </div>
+
+<script>
+  const inputs = document.querySelectorAll('.otp-inputs input');
+  const hiddenOtp = document.getElementById('otp-hidden');
+
+  inputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+      // Only allow digits
+      e.target.value = e.target.value.replace(/\D/, '');
+
+      // Move to next box if a digit is entered
+      if (e.target.value && index < inputs.length - 1) {
+        inputs[index + 1].focus();
+      }
+
+      // Combine all values into hidden field
+      hiddenOtp.value = Array.from(inputs).map(inp => inp.value).join('');
+    });
+
+    input.addEventListener('keydown', (e) => {
+      // Backspace: move focus to previous input if empty
+      if (e.key === 'Backspace' && !input.value && index > 0) {
+        inputs[index - 1].focus();
+      }
+    });
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Migration Care Plus - Healthcare Platform</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+    <style>
+        /* Login Button */
+        nav a.login-btn {
+            padding: 8px 16px;
+            background-color: #007bff;
+            color: #fff;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-left: 10px;
+            transition: background 0.3s;
+        }
+        nav a.login-btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Image Showcase Grid */
+        .showcase-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .showcase-card {
+            flex: 1 1 45%;
+            background: #f9f9f9;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .showcase-card img {
+            width: 100%;
+            display: block;
+            cursor: pointer;
+        }
+        .showcase-text {
+            padding: 15px;
+        }
+        .clamped-text {
+            display: -webkit-box;
+            -webkit-line-clamp: 6;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .read-more {
+            display: inline-block;
+            margin-top: 10px;
+            color: #007bff;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .read-more:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Floating Background Elements -->
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+    <div class="floating-orb"></div>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="#" class="logo">
+                    <div class="logo-icon">MC+</div>
+                    Migration Care Plus
+                </a>
+                <ul class="nav-menu" id="navMenu">
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#services">Services</a></li>
+                    <li><a href="#your-id">Your ID</a></li>
+                    <li><a href="#status">Status</a></li>
+                    <li><a href="#id-verification">ID Verification</a></li>
+                    <li><a href="#support">Support</a></li>
+                </ul>
+                <a href="{{ url_for('login') }}" class="login-btn">Login</a>
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">☰</button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+        <div class="container">
+            <h1>Migration Care Plus</h1>
+            <p>Transforming healthcare access for migrant workers and their families through digital innovation and comprehensive welfare programs.</p>
+            <div class="cta-buttons">
+                <a href="{{ url_for('login') }}" class="btn-primary">Get Your MC Care Number</a>
+                <a href="#learn-more" class="btn-secondary">Learn More</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Image Showcase Section -->
+    <section class="image-showcase">
+        <div class="container showcase-grid">
+
+            <div class="showcase-card">
+                <img src="{{ url_for('static', filename='img/showcase1.jpg') }}" alt="Showcase 1">
+                <div class="showcase-text">
+                    <p class="clamped-text">
+                        Migration workers are people who leave their hometowns seeking jobs in other states or countries.
+                        In India, most migrants come from Bihar, Uttar Pradesh, West Bengal, Odisha, and Assam.
+                        Kerala alone has around 3.5 million migrant workers.
+                        They are mostly young men aged between 18–40 years.
+                        Major sectors include construction, agriculture, manufacturing, hospitality, and domestic work.
+                        Construction is the largest employer, engaging around 40% of migrant workers in Kerala.
+                        Their daily wages usually range from ₹400 to ₹900 depending on the sector.
+                        Many face poor housing, sanitation, and health conditions.
+                        Job insecurity and exploitation by contractors are common issues.
+                        They often face language barriers and cultural differences in Kerala.
+                        Migrant workers contribute significantly to Kerala’s economy and infrastructure.
+                        Kerala provides AWAZ Health Insurance for free treatment and accident coverage.
+                        The Kerala Migrant Workers Welfare Board offers social security benefits.
+                        Despite schemes, many workers remain unaware or unregistered.
+                        Migrant workers are essential but vulnerable, needing better protection and inclusion.
+                    </p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </div>
+
+            <div class="showcase-card">
+                <img src="{{ url_for('static', filename='img/showcase2.jpg') }}" alt="Showcase 2">
+                <div class="showcase-text">
+                    <p class="clamped-text">
+                        The Kerala government has introduced several welfare schemes to support migrant workers in the state.
+                        The AWAZ Health Insurance Scheme provides free medical coverage up to ₹15,000 per year,
+                        along with an accidental death benefit of ₹2 lakh and disability coverage of ₹50,000, issued through the AWAZ health card.
+                        To address housing issues, the Apna Ghar Project offers affordable dormitory-style accommodation near industrial hubs,
+                        ensuring safe and hygienic living conditions.
+                        The state has also set up the Kerala Migrant Workers Welfare Board,
+                        which provides social security benefits such as pensions, insurance, and emergency assistance.
+                        In addition, Kerala runs skill training and language education programs to help migrants learn Malayalam
+                        and enhance their employability, while also supporting the education of migrant workers’ children
+                        through special schools with multi-lingual teachers.
+                        Further, under the One Nation One Ration Card scheme, migrant workers can access subsidized food grains
+                        using their ration cards from their home states, ensuring food security across Kerala.
+                        These initiatives together reflect Kerala’s commitment to protecting and integrating migrant workers into society.
+                    </p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features" id="services">
+        <div class="container">
+            <h2>Our Services</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🏥</div>
+                    <h3>Hospital Network</h3>
+                    <p>Access to 500+ government hospitals nationwide with seamless registration and treatment processes.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📱</div>
+                    <h3>Digital Health Records</h3>
+                    <p>Secure, portable health records that follow you wherever you migrate for work or treatment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">💊</div>
+                    <h3>Medicine Assistance</h3>
+                    <p>Subsidized medicines and emergency medical support for registered migrant workers and families.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🚑</div>
+                    <h3>Emergency Care</h3>
+                    <p>24/7 emergency medical services with priority treatment for MC Care Number holders.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">👨‍⚕</div>
+                    <h3>Specialist Consultations</h3>
+                    <p>Access to specialist doctors and telemedicine consultations across different states.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Health Monitoring</h3>
+                    <p>Regular health checkups and preventive care programs tailored for migrant communities.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <h2>Impact Statistics</h2>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number">NIL</div>
+                    <div class="stat-label">Registered Workers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">NIL</div>
+                    <div class="stat-label">Partner Hospitals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">NIL</div>
+                    <div class="stat-label">States Covered</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">NIL</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Why Migration Care Plus Matters -->
+    <section class="why-matters">
+        <div class="why-container">
+            <div class="why-text">
+                <h2>Why Migration Care Plus Matters</h2>
+                <p>
+                    Migration Care Plus is revolutionizing healthcare access for India's 
+                    100+ million migrant workers. Our platform breaks down barriers that 
+                    have historically prevented migrant communities from accessing quality 
+                    healthcare services.
+                </p>
+            </div>
+            <div class="why-bars">
+                <div class="why-bar">
+                    <div class="why-bar-title">🌍 Universal Access</div>
+                    <p>Healthcare without borders - access medical services in any state with your MC Care Number.</p>
+                </div>
+                <div class="why-bar">
+                    <div class="why-bar-title">💰 Financial Protection</div>
+                    <p>Subsidized treatments and medicines reduce healthcare costs by up to 70% for registered families.</p>
+                </div>
+                <div class="why-bar">
+                    <div class="why-bar-title">🩺 Trusted Healthcare</div>
+                    <p>Partnering with 500+ government hospitals and verified doctors to ensure the best medical care.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Read More Script -->
+    <script>
+      document.querySelectorAll(".read-more").forEach(link => {
+        link.addEventListener("click", function(e) {
+          e.preventDefault();
+          const paragraph = this.previousElementSibling;
+
+          paragraph.classList.toggle("expanded");
+
+          if (paragraph.classList.contains("expanded")) {
+            this.textContent = "Read Less";
+          } else {
+            this.textContent = "Read More";
+          }
+        });
+      });
+    </script>
+
+<!-- Floating Chat Assistant -->
+<div id="chatbot-button">💬</div>
+
+<div id="chatbot-box">
+  <div id="chatbot-header">
+    <span>Virtual Assistant</span>
+    <button id="chatbot-close">×</button>
+  </div>
+  <div id="chatbot-messages">
+    <div class="msg bot">Hi, I’m your assistant! How can I help you today?</div>
+  </div>
+  <div id="chatbot-input-area">
+    <input type="text" id="chatbot-input" placeholder="Type a message...">
+    <button id="chatbot-send">➤</button>
+  </div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("chatbot-button");
+  const box = document.getElementById("chatbot-box");
+  const closeBtn = document.getElementById("chatbot-close");
+  const sendBtn = document.getElementById("chatbot-send");
+  const input = document.getElementById("chatbot-input");
+  const messages = document.getElementById("chatbot-messages");
+
+  // Toggle open/close
+  btn.addEventListener("click", () => {
+    box.classList.add("active");
+    btn.style.display = "none";
+  });
+
+  closeBtn.addEventListener("click", () => {
+    box.classList.remove("active");
+    btn.style.display = "flex";
+  });
+
+  // Send messages
+  function sendMessage() {
+    const text = input.value.trim();
+    if (!text) return;
+
+    const userMsg = document.createElement("div");
+    userMsg.className = "msg user";
+    userMsg.textContent = text;
+    messages.appendChild(userMsg);
+    input.value = "";
+    messages.scrollTop = messages.scrollHeight;
+
+    setTimeout(() => {
+      const botMsg = document.createElement("div");
+      botMsg.className = "msg bot";
+      botMsg.textContent = "You said: " + text;
+      messages.appendChild(botMsg);
+      messages.scrollTop = messages.scrollHeight;
+    }, 500);
+  }
+
+  sendBtn.addEventListener("click", sendMessage);
+  input.addEventListener("keypress", e => {
+    if (e.key === "Enter") sendMessage();
+  });
+
+  // Dragging helper
+  function makeDraggable(element) {
+    let isDragging = false, offsetX, offsetY;
+
+    element.addEventListener("mousedown", (e) => {
+      isDragging = true;
+      offsetX = e.clientX - element.offsetLeft;
+      offsetY = e.clientY - element.offsetTop;
+      element.style.transition = "none";
+    });
+
+    document.addEventListener("mousemove", (e) => {
+      if (isDragging) {
+        element.style.left = (e.clientX - offsetX) + "px";
+        element.style.top = (e.clientY - offsetY) + "px";
+        element.style.bottom = "auto";
+        element.style.right = "auto";
+      }
+    });
+
+    document.addEventListener("mouseup", () => {
+      isDragging = false;
+      element.style.transition = "all 0.2s ease";
+    });
+  }
+
+  // Make both draggable
+  makeDraggable(box);
+  makeDraggable(btn);
+});
+</script>
+</body>
+</html>

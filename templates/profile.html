@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MigrantCare+ | Medical Profile</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/profile-style.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    .qr-section {
+      margin-top: 20px;
+      padding: 15px;
+      background: #f8f8f8;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    .qr-section h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .qr-wrapper {
+      display: inline-block;
+      padding: 20px;        /* White margin around QR on screen */
+      background: white;    
+      border-radius: 10px;
+    }
+    #qrcode canvas {
+      display: block;
+      margin: auto;
+    }
+    .download-btn {
+      margin-top: 10px;
+      padding: 8px 12px;
+      font-size: 14px;
+      background: #007BFF;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .download-btn:hover {
+      background: #0056b3;
+    }
+
+    
+  </style>
+</head>
+<body>
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <h1>MigrantCare+</h1>
+    <nav>
+      <a href="{{ url_for('home') }}">🏠 Home</a>
+      <a href="#">📝 Schemes</a>
+      <a href="#">📅 Appointments</a>
+      <a href="{{ url_for('report')}}">📑 Reports</a>
+      <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
+    </nav>
+  </header>
+
+  <div class="profile-layout">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="photo-card">
+        <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="User Photo">
+        <h2 class="username">{{ fullName }}</h2>
+        <p class="user-role">{{ role }}</p>
+      </div>
+      <ul class="sidebar-links">
+        <li><a href="#personal">👤 Personal Info</a></li>
+        <li><a href="#family">👨‍👩‍👦 Family</a></li>
+        <li><a href="#health">🩺 Health & Work</a></li>
+        <li><a href="#insurance">💳 Insurance</a></li>
+        <li><a href="#address">🏠 Address</a></li>
+      </ul>
+
+      <!-- QR Code Generator -->
+      <div class="qr-section">
+        <h3>🔐 Your Login QR</h3>
+        <div class="qr-wrapper">
+          <div id="qrcode"></div>
+        </div>
+        <button class="download-btn" onclick="downloadQR()">⬇️ Download QR</button>
+      </div>
+    </aside>
+
+    <!-- Main Profile -->
+    <main class="profile-main">
+      <section id="personal">
+        <h3>Personal Information</h3>
+        <div class="info-grid">
+          <label>Full Name</label><div>{{ fullName }}</div>
+          <label>Age</label><div>{{ age }}</div>
+          <label>Date of Birth</label><div>{{ dob }}</div>
+          <label>Gender</label><div>{{ gender }}</div>
+          <label>Phone Number</label><div>{{ phone }}</div>
+          <label>Email ID</label><div>{{ email }}</div>
+          <label>Nationality</label><div>{{ nationality }}</div>
+          <label>Blood Group</label><div>{{ blood }}</div>
+        </div>
+      </section>
+
+      <section id="family">
+        <h3>Family Details</h3>
+        <div class="info-grid">
+          <label>Father's Name</label><div>{{ fatherName }}</div>
+          <label>Mother's Name</label><div>{{ motherName }}</div>
+          <label>Father's Contact</label><div>{{ fatherContact }}</div>
+          <label>Mother's Contact</label><div>{{ motherContact }}</div>
+        </div>
+      </section>
+
+      <section id="health">
+        <h3>Health & Work</h3>
+        <div class="info-grid">
+          <label>Identity Marks</label><div>{{ marks }}</div>
+          <label>Health Issues</label><div>{{ issues }}</div>
+          <label>Type of Work</label><div>{{ workType }}</div>
+          <label>Work Permit ID</label><div>{{ workId }}</div>
+        </div>
+      </section>
+
+      <section id="insurance">
+        <h3>Insurance</h3>
+        <div class="info-grid">
+          <label>Insurance No</label><div>{{ insuranceNo }}</div>
+          <label>Insurance Validity</label><div>{{ insuranceValid }}</div>
+        </div>
+      </section>
+
+      <section id="address">
+        <h3>Address</h3>
+        <div class="info-grid">
+          <label>Permanent Address</label><div>{{ permAddr }}</div>
+          <label>Residential Address</label><div>{{ resAddr }}</div>
+          <label>Office Address</label><div>{{ officeAddr }}</div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script>
+    // QR Data as JSON for clean scanning
+    var qrData = JSON.stringify({
+      member_id: "{{ member_id }}",
+      password: "{{ password }}"
+    });
+
+    // Generate QR code
+    var qrcode = new QRCode(document.getElementById("qrcode"), {
+      text: qrData,
+      width: 250,
+      height: 250,
+      useSVG: false,
+      colorDark : "#000000",
+      colorLight : "#ffffff",
+      correctLevel : QRCode.CorrectLevel.H
+    });
+
+    // Download QR as PNG with white margin included
+    function downloadQR() {
+      const originalCanvas = document.querySelector("#qrcode canvas");
+      const qrSize = originalCanvas.width;
+      const margin = 20; // white margin in pixels
+
+      // Create a new canvas bigger than original
+      const canvasWithMargin = document.createElement("canvas");
+      canvasWithMargin.width = qrSize + margin * 2;
+      canvasWithMargin.height = qrSize + margin * 2;
+
+      const ctx = canvasWithMargin.getContext("2d");
+
+      // Fill white background
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvasWithMargin.width, canvasWithMargin.height);
+
+      // Draw the QR code centered
+      ctx.drawImage(originalCanvas, margin, margin, qrSize, qrSize);
+
+      // Download as PNG
+      const link = document.createElement("a");
+      link.href = canvasWithMargin.toDataURL("image/png");
+      link.download = "login_qr.png";
+      link.click();
+    }
+  </script>
+</body>
+</html>

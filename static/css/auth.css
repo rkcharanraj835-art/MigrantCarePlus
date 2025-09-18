@@ -1,0 +1,142 @@
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Arial', sans-serif;
+}
+
+/* Body */
+body {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0077b6, #00b4d8, #90e0ef);
+}
+
+/* Auth Container */
+.auth-container {
+  background: #fff;
+  padding: 40px 30px;
+  border-radius: 15px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+  width: 360px;
+  text-align: center;
+}
+
+/* Heading */
+.auth-container h2 {
+  margin-bottom: 20px;
+  color: #0077b6;
+}
+
+/* Input Group */
+.input-group {
+  text-align: left;
+  margin-bottom: 15px;
+}
+
+.input-group label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 15px;
+  outline: none;
+  transition: 0.3s;
+}
+
+.input-group input:focus {
+  border-color: #0077b6;
+  box-shadow: 0 0 5px rgba(0,119,182,0.4);
+}
+
+/* Button */
+.btn {
+  width: 100%;
+  padding: 12px;
+  background: #0077b6;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.3s;
+}
+
+.btn:hover {
+  background: #0096c7;
+}
+
+/* Links */
+.auth-links {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #555;
+}
+
+.auth-links a {
+  color: #0077b6;
+  font-weight: 600;
+  text-decoration: none;
+  margin: 0 5px;
+}
+
+.auth-links a:hover {
+  text-decoration: underline;
+}
+
+/* Divider */
+.divider {
+  margin: 20px 0;
+  text-align: center;
+  color: #888;
+  position: relative;
+}
+
+.divider::before, .divider::after {
+  content: "";
+  height: 1px;
+  background: #ddd;
+  position: absolute;
+  top: 50%;
+  width: 40%;
+}
+
+.divider::before { left: 0; }
+.divider::after { right: 0; }
+
+/* Social Login Buttons */
+.social-login {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.social-login button {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 500;
+  transition: 0.3s;
+}
+
+.google { background: #fff; color: #db4437; }
+.google:hover { background: #ffe6e6; }
+
+.facebook { background: #1877f2; color: white; border: none; }
+.facebook:hover { background: #0d5cc6; }
+
