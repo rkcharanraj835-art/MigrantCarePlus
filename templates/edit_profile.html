@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Profile</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: #f5f7fa;
+      font-family: Arial, sans-serif;
+    }
+    .profile-form {
+      max-width: 900px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+      color: #333;
+    }
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .section-title {
+      margin-top: 30px;
+      margin-bottom: 15px;
+      font-weight: bold;
+      font-size: 18px;
+      color: #444;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 5px;
+    }
+    .text-danger {
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="profile-form">
+      <h2>Edit Profile</h2>
+
+      <!-- Profile Edit Form -->
+      <form method="POST" action="{{ url_for('edit_profile') }}">
+        <!-- Personal Info -->
+        <div class="section-title">Personal Information</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Full Name</label>
+            <input type="text" class="form-control" name="fullName" value="{{ user.fullName or '' }}" required>
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Age</label>
+            <input type="number" class="form-control" name="age" value="{{ user.age or '' }}">
+          </div>
+          <div class="col-md-3">
+            <label class="form-label">Date of Birth</label>
+            <input type="date" class="form-control" name="dob" value="{{ user.dob|default('', true) }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Gender</label>
+            <select class="form-select" name="gender">
+              <option value="Male"   {% if user.gender == 'Male' %}selected{% endif %}>Male</option>
+              <option value="Female" {% if user.gender == 'Female' %}selected{% endif %}>Female</option>
+              <option value="Other"  {% if user.gender == 'Other' %}selected{% endif %}>Other</option>
+            </select>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Phone</label>
+            <input type="text" class="form-control" name="phone" value="{{ user.phone or '' }}">
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-control" name="email" value="{{ user.email or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Nationality</label>
+            <input type="text" class="form-control" name="nationality" value="{{ user.nationality or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Blood Group</label>
+            <input type="text" class="form-control" name="blood" value="{{ user.blood or '' }}">
+          </div>
+        </div>
+
+        <!-- Family Info -->
+        <div class="section-title">Family Details</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Father's Name</label>
+            <input type="text" class="form-control" name="fatherName" value="{{ user.fatherName or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mother's Name</label>
+            <input type="text" class="form-control" name="motherName" value="{{ user.motherName or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Father's Contact</label>
+            <input type="text" class="form-control" name="fatherContact" value="{{ user.fatherContact or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Mother's Contact</label>
+            <input type="text" class="form-control" name="motherContact" value="{{ user.motherContact or '' }}">
+          </div>
+        </div>
+
+        <!-- Additional Info -->
+        <div class="section-title">Additional Info</div>
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label class="form-label">Identity Marks</label>
+            <input type="text" class="form-control" name="marks" value="{{ user.marks or '' }}">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Health Issues</label>
+            <input type="text" class="form-control" name="issues" value="{{ user.issues or '' }}">
+          </div>
+        </div>
+
+        <!-- Work Info -->
+        <div class="section-title">Work Details</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Work Type</label>
+            <input type="text" class="form-control" name="workType" value="{{ user.workType or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Work ID</label>
+            <input type="text" class="form-control" name="workId" value="{{ user.workId or '' }}">
+          </div>
+        </div>
+
+        <!-- Insurance -->
+        <div class="section-title">Insurance Details</div>
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Insurance Number</label>
+            <input type="text" class="form-control" name="insuranceNo" value="{{ user.insuranceNo or '' }}">
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Insurance Validity</label>
+            <input type="date" class="form-control" name="insuranceValid" value="{{ user.insuranceValid|default('', true) }}">
+          </div>
+        </div>
+
+        <!-- Addresses -->
+        <div class="section-title">Addresses</div>
+        <div class="row g-3">
+          <div class="col-md-12">
+            <label class="form-label">Permanent Address</label>
+            <input type="text" class="form-control" name="permAddr" value="{{ user.permAddr or '' }}">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Residential Address</label>
+            <input type="text" class="form-control" name="resAddr" value="{{ user.resAddr or '' }}">
+          </div>
+          <div class="col-md-12">
+            <label class="form-label">Office Address</label>
+            <input type="text" class="form-control" name="officeAddr" value="{{ user.officeAddr or '' }}">
+          </div>
+        </div>
+
+        <!-- Password Change -->
+        <div class="section-title">Change Password</div>
+        <div class="row g-3">
+          <div class="col-md-4">
+            <label class="form-label">Old Password</label>
+            <input type="password" class="form-control" name="old_password" placeholder="Enter old password">
+            {% if errors.old_password %}
+              <div class="text-danger mt-1">{{ errors.old_password }}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-control" name="new_password" placeholder="Enter new password">
+            {% if errors.new_password %}
+              <div class="text-danger mt-1">{{ errors.new_password }}</div>
+            {% endif %}
+          </div>
+          <div class="col-md-4">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-control" name="confirm_password" placeholder="Re-enter new password">
+          </div>
+        </div>
+
+        <div class="auth-links text-center mt-3">
+  <a href="{{ url_for('profile') }}" class="btn btn-link">← Back to Profile</a>
+</div>
+
+        <!-- Submit -->
+        <div class="mt-4">
+          <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

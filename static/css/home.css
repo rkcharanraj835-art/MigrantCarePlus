@@ -640,3 +640,55 @@ body {
 #chatbot-send:hover {
   background: #17a673;
 }
+
+/* QR Button */
+.qr-btn {
+  margin-left: 10px;
+  padding: 8px 16px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.qr-btn:hover { background: #0056b3; }
+
+/* Modal Background */
+.qr-modal {
+  display: none;
+  position: fixed;
+  z-index: 1000;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+}
+
+/* Modal Content */
+.qr-modal-content {
+  position: relative;
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  text-align: center;
+  width: 400px;
+}
+
+/* Close Button */
+.qr-close {
+  position: absolute;
+  right: 15px;
+  top: 10px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  color: #333;
+}
+
+/* Scanner Mirror Effect */
+#qr-reader video {
+  transform: scaleX(-1); /* mirror view */
+  border-radius: 8px;
+}

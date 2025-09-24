@@ -5,17 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MigrantCare+ | Login</title>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/auth.css') }}">
-<!-- html5-qrcode script -->
-<script src="https://unpkg.com/html5-qrcode"></script>
 <style>
-  #qr-reader {
-    width: 320px;
-    margin: 20px auto;
-    display: none; /* hidden until scan button clicked */
-  }
-  #qr-reader video {
-    transform: scaleX(-1) !important; /* Fix mirror flip */
-  }
   .error-msg {
     color: red;
     font-weight: bold;
@@ -35,7 +25,10 @@
     <form id="login-form" method="post">
       <div class="input-group">
         <label for="member-id">Member-ID</label>
-        <input type="text" id="member-id" name="member_id" placeholder="Enter your Member-ID" required>
+        <!-- ✅ auto-filled from ?member_id=XYZ -->
+        <input type="text" id="member-id" name="member_id"
+               placeholder="Enter your Member-ID"
+               value="{{ request.args.get('member_id','') }}" required>
       </div>
 
       <div class="input-group">
@@ -43,97 +36,43 @@
         <input type="password" id="password" name="password" placeholder="Enter your password" required>
       </div>
 
-      <!-- Inline error message -->
-      <p id="login-msg" class="error-msg"></p>
+      <!-- Login status message -->
+      <p id="login-msg"></p>
 
       <button type="submit" class="btn">Login</button>
     </form>
 
     <div class="auth-links">
-      <a href="{{ url_for('forgot') }}?member_id=" id="forgot-link">Forgot Password?</a> | 
+      <a href="{{ url_for('forgot') }}?member_id={{ request.args.get('member_id','') }}" id="forgot-link">
+        Forgot Password?
+      </a> | 
       <a href="{{ url_for('create_account') }}">Create Account</a>
     </div>
 
     <div class="auth-links">
       <a href="{{ url_for('home') }}">← Back to Home</a>
     </div>
-
-    <!-- QR Login Section -->
-    <div class="qr-login">
-      <button type="button" id="start-scan" class="btn">Scan QR Code to Login</button>
-      <div id="qr-reader"></div>
-    </div>
   </div>
 
 <script>
-const scanBtn = document.getElementById("start-scan");
-const qrReader = document.getElementById("qr-reader");
-const memberInput = document.getElementById("member-id");
-const passwordInput = document.getElementById("password");
-const forgotLink = document.getElementById("forgot-link");
 const loginForm = document.getElementById("login-form");
 const loginMsg = document.getElementById("login-msg");
-let html5Qr;
+const memberInput = document.getElementById("member-id");
+const forgotLink = document.getElementById("forgot-link");
 
-// Update forgot password link dynamically with entered Member-ID
+// Update Forgot Password link dynamically
 memberInput.addEventListener('input', () => {
   const memberId = memberInput.value.trim();
   forgotLink.href = "{{ url_for('forgot') }}?member_id=" + encodeURIComponent(memberId);
 });
 
-// QR code login
-scanBtn.addEventListener("click", () => {
-  if (html5Qr) {
-    html5Qr.stop().then(() => {
-      html5Qr.clear();
-      html5Qr = null;
-      qrReader.style.display = "none";
-      scanBtn.textContent = "Scan QR Code";
-    });
-    return;
-  }
-
-  qrReader.style.display = "block";
-  scanBtn.textContent = "Stop Scanning";
-
-  html5Qr = new Html5Qrcode("qr-reader");
-
-  html5Qr.start(
-    { facingMode: "user" },
-    { fps: 10 },
-    decodedText => {
-      try {
-        const data = JSON.parse(decodedText);
-        memberInput.value = data.member_id || "";
-        passwordInput.value = data.password || "";
-      } catch (e) {
-        console.error("Invalid QR data", decodedText);
-      }
-
-      html5Qr.stop().then(() => {
-        html5Qr.clear();
-        html5Qr = null;
-        qrReader.style.display = "none";
-        scanBtn.textContent = "Scan QR Code";
-      });
-    },
-    errorMessage => {
-      console.warn("Scan error:", errorMessage);
-    }
-  ).catch(err => {
-    console.error("Camera start error:", err);
-    alert("❌ Unable to access webcam. Please allow camera permission.");
-    scanBtn.textContent = "Scan QR Code";
-  });
-});
-
-// AJAX Login
+// AJAX Login handler
 loginForm.addEventListener('submit', async (e) => {
-  e.preventDefault(); // prevent normal form submission
+  e.preventDefault();
   loginMsg.textContent = "";
 
   const member_id = memberInput.value.trim();
-  const password = passwordInput.value;
+  const password = document.getElementById("password").value;
 
   try {
     const response = await fetch("{{ url_for('login') }}", {
@@ -149,7 +88,7 @@ loginForm.addEventListener('submit', async (e) => {
       loginMsg.textContent = "✅ Login successful. Redirecting...";
       setTimeout(() => {
         window.location.href = "{{ url_for('profile') }}";
-      }, 1000);
+      }, 800);
     } else {
       loginMsg.className = "error-msg";
       loginMsg.textContent = "❌ " + data.message;

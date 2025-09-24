@@ -1,12 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>MigrantCare+ | Medical Profile</title>
+
+  <!-- External CSS -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/profile-style.css') }}">
+  <!-- QRCode.js -->
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+
   <style>
+    /* --- QR Section Styling --- */
     .qr-section {
       margin-top: 20px;
       padding: 15px;
@@ -22,8 +27,8 @@
     }
     .qr-wrapper {
       display: inline-block;
-      padding: 20px;        /* White margin around QR on screen */
-      background: white;    
+      padding: 20px; /* White margin around QR on screen */
+      background: #ffffff;
       border-radius: 10px;
     }
     #qrcode canvas {
@@ -44,10 +49,9 @@
     .download-btn:hover {
       background: #0056b3;
     }
-
-    
   </style>
 </head>
+
 <body>
   <!-- Top Navbar -->
   <header class="navbar">
@@ -56,7 +60,7 @@
       <a href="{{ url_for('home') }}">🏠 Home</a>
       <a href="#">📝 Schemes</a>
       <a href="#">📅 Appointments</a>
-      <a href="{{ url_for('report')}}">📑 Reports</a>
+      <a href="{{ url_for('report') }}">📑 Reports</a>
       <a href="{{ url_for('logout') }}" class="logout">🚪 Logout</a>
     </nav>
   </header>
@@ -69,17 +73,19 @@
         <h2 class="username">{{ fullName }}</h2>
         <p class="user-role">{{ role }}</p>
       </div>
+
       <ul class="sidebar-links">
         <li><a href="#personal">👤 Personal Info</a></li>
         <li><a href="#family">👨‍👩‍👦 Family</a></li>
         <li><a href="#health">🩺 Health & Work</a></li>
         <li><a href="#insurance">💳 Insurance</a></li>
         <li><a href="#address">🏠 Address</a></li>
+        <li><a href="edit_profile">🖊️ Edit profile</a></li>
       </ul>
 
       <!-- QR Code Generator -->
       <div class="qr-section">
-        <h3>🔐 Your Login QR</h3>
+        <h3>🔐 Your Profile QR</h3>
         <div class="qr-wrapper">
           <div id="qrcode"></div>
         </div>
@@ -87,7 +93,7 @@
       </div>
     </aside>
 
-    <!-- Main Profile -->
+    <!-- Main Profile Content -->
     <main class="profile-main">
       <section id="personal">
         <h3>Personal Information</h3>
@@ -143,47 +149,36 @@
   </div>
 
   <script>
-    // QR Data as JSON for clean scanning
-    var qrData = JSON.stringify({
-      member_id: "{{ member_id }}",
-      password: "{{ password }}"
-    });
+    // ✅ Safer: just embed the user's public profile URL
+    var qrData = "{{ public_url }}";
 
-    // Generate QR code
     var qrcode = new QRCode(document.getElementById("qrcode"), {
       text: qrData,
       width: 250,
       height: 250,
-      useSVG: false,
-      colorDark : "#000000",
-      colorLight : "#ffffff",
-      correctLevel : QRCode.CorrectLevel.H
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+      correctLevel: QRCode.CorrectLevel.H
     });
 
-    // Download QR as PNG with white margin included
+    // Allow user to download QR image
     function downloadQR() {
       const originalCanvas = document.querySelector("#qrcode canvas");
       const qrSize = originalCanvas.width;
-      const margin = 20; // white margin in pixels
+      const margin = 20;
 
-      // Create a new canvas bigger than original
       const canvasWithMargin = document.createElement("canvas");
       canvasWithMargin.width = qrSize + margin * 2;
       canvasWithMargin.height = qrSize + margin * 2;
 
       const ctx = canvasWithMargin.getContext("2d");
-
-      // Fill white background
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvasWithMargin.width, canvasWithMargin.height);
-
-      // Draw the QR code centered
       ctx.drawImage(originalCanvas, margin, margin, qrSize, qrSize);
 
-      // Download as PNG
       const link = document.createElement("a");
       link.href = canvasWithMargin.toDataURL("image/png");
-      link.download = "login_qr.png";
+      link.download = "profile_qr.png";
       link.click();
     }
   </script>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ user.fullName }} - Public Profile</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f4f9fd;
+      color: #333;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+    }
+    .profile-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      width: 100%;
+      max-width: 650px;
+      padding: 2rem;
+    }
+    .profile-card h1 {
+      font-size: 1.9rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 3px solid #4a90e2;
+      color: #2c3e50;
+      text-align: center;
+    }
+    .profile-field {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 0.6rem 0;
+      padding: 0.8rem 1rem;
+      border-radius: 6px;
+      transition: background 0.25s ease;
+      background: #fafafa;
+      border: 1px solid #e4e9f0;
+    }
+    .profile-field:hover {
+      background: #f0f6fb;
+    }
+    .label {
+      font-weight: 600;
+      color: #2c3e50;
+      flex: 1;
+    }
+    .value {
+      flex: 2;
+      text-align: right;
+      color: #555;
+      font-style: italic;
+    }
+    @media (max-width: 600px) {
+      body { padding: 1rem; }
+      .profile-field { flex-direction: column; align-items: flex-start; text-align: left; }
+      .value { text-align: left; font-style: normal; margin-top: 0.3rem; color: #444; }
+    }
+    /* Floating bottom login button */
+    .floating-login-btn {
+      position: fixed;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #007bff;
+      color: #fff;
+      padding: 14px 26px;
+      font-size: 1rem;
+      font-weight: 600;
+      border-radius: 8px;
+      text-decoration: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      transition: background 0.3s ease, transform 0.2s ease;
+      z-index: 1000;
+    }
+    .floating-login-btn:hover {
+      background: #0056b3;
+      transform: translateX(-50%) scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="profile-card">
+    <h1>{{ user.fullName }}</h1>
+
+    <div class="profile-field"><span class="label">Age:</span> <span class="value">{{ user.age }}</span></div>
+    <div class="profile-field"><span class="label">Date of Birth:</span> <span class="value">{{ user.dob }}</span></div>
+    <div class="profile-field"><span class="label">Gender:</span> <span class="value">{{ user.gender }}</span></div>
+    <div class="profile-field"><span class="label">Phone:</span> <span class="value">{{ user.phone }}</span></div>
+    <div class="profile-field"><span class="label">Email:</span> <span class="value">{{ user.email }}</span></div>
+    <div class="profile-field"><span class="label">Nationality:</span> <span class="value">{{ user.nationality }}</span></div>
+    <div class="profile-field"><span class="label">Blood Group:</span> <span class="value">{{ user.blood }}</span></div>
+    <div class="profile-field"><span class="label">Father's Name:</span> <span class="value">{{ user.fatherName }}</span></div>
+    <div class="profile-field"><span class="label">Mother's Name:</span> <span class="value">{{ user.motherName }}</span></div>
+    <div class="profile-field"><span class="label">Father's Contact:</span> <span class="value">{{ user.fatherContact }}</span></div>
+    <div class="profile-field"><span class="label">Mother's Contact:</span> <span class="value">{{ user.motherContact }}</span></div>
+    <div class="profile-field"><span class="label">Identity Marks:</span> <span class="value">{{ user.marks }}</span></div>
+    <div class="profile-field"><span class="label">Health Issues:</span> <span class="value">{{ user.issues }}</span></div>
+    <div class="profile-field"><span class="label">Work Type:</span> <span class="value">{{ user.workType }}</span></div>
+    <div class="profile-field"><span class="label">Work Permit ID:</span> <span class="value">{{ user.workId }}</span></div>
+    <div class="profile-field"><span class="label">Insurance Number:</span> <span class="value">{{ user.insuranceNo }}</span></div>
+    <div class="profile-field"><span class="label">Insurance Validity:</span> <span class="value">{{ user.insuranceValid }}</span></div>
+    <div class="profile-field"><span class="label">Permanent Address:</span> <span class="value">{{ user.permAddr }}</span></div>
+    <div class="profile-field"><span class="label">Residential Address:</span> <span class="value">{{ user.resAddr }}</span></div>
+    <div class="profile-field"><span class="label">Office Address:</span> <span class="value">{{ user.officeAddr }}</span></div>
+  </div>
+
+  <!-- ✅ Floating Login Button with member_id -->
+  <a href="{{ url_for('login', member_id=user.member_id) }}" class="floating-login-btn">
+    🔑 Login as {{ user.fullName }}
+  </a>
+ 
+</body>
+</html>

@@ -1,20 +1,24 @@
-from flask import Flask, render_template, request, redirect, url_for, session, send_file, jsonify
-from werkzeug.security import generate_password_hash, check_password_hash
-import qrcode, json, io, random as r, smtplib
-from email.message import EmailMessage
+from flask import (
+    Flask, render_template, request, redirect,
+    url_for, session, send_file, jsonify, flash
+)
+import qrcode
+import io
 import mysql.connector
+import random as r
+import smtplib
+from email.message import EmailMessage
+from deep_translator import GoogleTranslator
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # Move to env var in production
+app.secret_key = "supersecretkey"  # ⚠️ Use environment variable in production
 
 # ---------------- MySQL config ----------------
-# Use your PC public IP or DDNS here
 db_config = {
-    "host": "121.200.51.86",
-    "user": "Ghost",
-    "password": "user@server",
-    "database": "MigrantCarePlus",
-    "port": 3306
+    "host": "localhost",
+    "user": "root",
+    "password": "",
+    "database": "MigrantCarePlus"
 }
 
 def get_db_connection():
@@ -29,15 +33,70 @@ def send_otp_email(to_mail, purpose="Verification"):
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
     from_mail = 'migrantcareplus@gmail.com'
-    server.login(from_mail, 'afmi mliz abwv vuqi')  # Use env variable in production
+    server.login(from_mail, 'afmi mliz abwv vuqi')  # ⚠️ Use env variable in production
 
     msg = EmailMessage()
     msg['Subject'] = f"{purpose} OTP"
     msg['From'] = from_mail
     msg['To'] = to_mail
-    msg.set_content(f"Your MigrantCare+ {purpose} OTP is: {otp}\nDo not share it with anyone.")
+    msg.set_content(
+        f"Your MigrantCare+ {purpose} OTP is: {otp}\nDo not share it with anyone."
+    )
     server.send_message(msg)
     server.quit()
+
+# ---------------- QR code: generate URL to public profile ----------------
+@app.route('/user-qr')
+def user_qr():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    member_id = session["user"]
+    profile_url = url_for('public_profile', member_id=member_id, _external=True)
+
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=10,
+        border=4
+    )
+    qr.add_data(profile_url)
+    qr.make(fit=True)
+
+    img = qr.make_image(fill_color="black", back_color="white")
+
+    img_io = io.BytesIO()
+    img.save(img_io, 'PNG')
+    img_io.seek(0)
+    return send_file(img_io, mimetype='image/png')
+
+# ---------------- Public profile view (read-only) ----------------
+@app.route('/profile/<member_id>')
+def public_profile(member_id):
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    cursor.execute("SELECT * FROM users WHERE member_id = %s", (member_id,))
+    user = cursor.fetchone()
+    cursor.close()
+    conn.close()
+
+    if not user:
+        return "User not found", 404
+
+    return render_template("public_profile.html", user=user)
+
+# ---------------- Language Translation ----------------
+@app.route('/translate', methods=['POST'])
+def translate_text():
+    data = request.get_json()
+    text = data.get("text", "")
+    target_lang = data.get("lang", "en")
+
+    try:
+        translated = GoogleTranslator(source='auto', target=target_lang).translate(text)
+        return jsonify({"success": True, "translated": translated})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)})
 
 # ---------------- Home & Profile ----------------
 @app.route('/')
@@ -59,7 +118,98 @@ def profile():
 
     if not user:
         return redirect(url_for("login"))
-    return render_template("profile.html", **user)
+
+    public_url = url_for('public_profile', member_id=member_id, _external=True)
+
+    return render_template("profile.html", **user, public_url=public_url)
+
+# ---------------- Edit profile ----------------
+@app.route("/edit_profile", methods=["GET", "POST"])
+def edit_profile():
+    if "user" not in session:
+        return redirect(url_for("login"))
+
+    conn = get_db_connection()
+    cursor = conn.cursor(dictionary=True)
+    member_id = session["user"]
+
+    errors = {}
+
+    if request.method == "POST":
+        fullName      = request.form["fullName"]
+        age           = request.form["age"]
+        dob           = request.form["dob"]
+        gender        = request.form["gender"]
+        phone         = request.form["phone"]
+        email         = request.form["email"]
+        nationality   = request.form["nationality"]
+        blood         = request.form["blood"]
+        fatherName    = request.form["fatherName"]
+        motherName    = request.form["motherName"]
+        fatherContact = request.form["fatherContact"]
+        motherContact = request.form["motherContact"]
+        marks         = request.form["marks"]
+        issues        = request.form["issues"]
+        workType      = request.form["workType"]
+        workId        = request.form["workId"]
+        insuranceNo   = request.form["insuranceNo"]
+        insuranceValid= request.form["insuranceValid"]
+        permAddr      = request.form["permAddr"]
+        resAddr       = request.form["resAddr"]
+        officeAddr    = request.form["officeAddr"]
+
+        cursor.execute("""
+            UPDATE users SET 
+              fullName=%s, age=%s, dob=%s, gender=%s, phone=%s, email=%s, nationality=%s, blood=%s,
+              fatherName=%s, motherName=%s, fatherContact=%s, motherContact=%s,
+              marks=%s, issues=%s, workType=%s, workId=%s,
+              insuranceNo=%s, insuranceValid=%s,
+              permAddr=%s, resAddr=%s, officeAddr=%s
+            WHERE member_id=%s
+        """, (fullName, age, dob, gender, phone, email, nationality, blood,
+              fatherName, motherName, fatherContact, motherContact,
+              marks, issues, workType, workId,
+              insuranceNo, insuranceValid,
+              permAddr, resAddr, officeAddr,
+              member_id))
+
+        old_password     = request.form.get("old_password")
+        new_password     = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+
+        if old_password or new_password or confirm_password:
+            cursor.execute("SELECT password FROM users WHERE member_id = %s", (member_id,))
+            user = cursor.fetchone()
+            current_password = user["password"]
+
+            if old_password != current_password:
+                errors["old_password"] = "❌ Old password is incorrect"
+
+            if new_password != confirm_password:
+                errors["new_password"] = "❌ New passwords do not match"
+
+            if not new_password.strip():
+                errors["new_password"] = "❌ New password cannot be empty"
+
+            if not errors:
+                cursor.execute("UPDATE users SET password=%s WHERE member_id=%s",
+                               (new_password, member_id))
+
+        if errors:
+            conn.commit()
+            cursor.execute("SELECT * FROM users WHERE member_id=%s", (member_id,))
+            user = cursor.fetchone()
+            cursor.close(); conn.close()
+            return render_template("edit_profile.html", user=user, errors=errors)
+
+        conn.commit()
+        cursor.close(); conn.close()
+        return redirect(url_for("profile"))
+
+    cursor.execute("SELECT * FROM users WHERE member_id=%s", (member_id,))
+    user = cursor.fetchone()
+    cursor.close(); conn.close()
+    return render_template("edit_profile.html", user=user, errors={})
 
 # ---------------- Login ----------------
 @app.route('/login', methods=['GET', 'POST'])
@@ -67,25 +217,29 @@ def login():
     if request.method == 'POST':
         if request.is_json:
             data = request.get_json()
-            member_id = data.get('member_id')
+            login_id = data.get('member_id')
             password = data.get('password')
         else:
-            member_id = request.form.get('member_id')
+            login_id = request.form.get('member_id')
             password = request.form.get('password')
 
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM users WHERE member_id = %s", (member_id,))
+        cursor.execute("SELECT * FROM users WHERE member_id = %s", (login_id,))
         user = cursor.fetchone()
         cursor.close()
         conn.close()
 
-        if user and check_password_hash(user['password'], password):
-            session["user"] = member_id
-            return jsonify({"success": True}) if request.is_json else redirect(url_for('profile'))
+        if user and user['password'] == password:
+            session["user"] = user['member_id']
+            if request.is_json:
+                return jsonify({"success": True})
+            return redirect(url_for('profile'))
         else:
             msg = "Invalid Member ID or Password"
-            return jsonify({"success": False, "message": msg}) if request.is_json else render_template('login.html', error_msg=msg)
+            if request.is_json:
+                return jsonify({"success": False, "message": msg})
+            return render_template('login.html', error_msg=msg)
 
     return render_template('login.html')
 
@@ -111,7 +265,7 @@ def forgot():
         send_otp_email(email, "Password Reset")
         return redirect(url_for('verify_reset_otp'))
 
-    return render_template('forgot.html', email=email)
+    return render_template('forgot.html')
 
 @app.route('/verify-reset-otp', methods=['GET', 'POST'])
 def verify_reset_otp():
@@ -120,8 +274,7 @@ def verify_reset_otp():
         if input_otp == session.get('otp'):
             session['otp_verified_email'] = session.get('otp_email')
             return redirect(url_for('set_new_password'))
-        else:
-            return "❌ Invalid OTP", 401
+        return "❌ Invalid OTP", 401
     return render_template('verify_reset_otp.html')
 
 @app.route('/set-new-password', methods=['GET', 'POST'])
@@ -133,12 +286,11 @@ def set_new_password():
         new_password = request.form.get('password')
         if not new_password:
             return "Password required", 400
-        hashed = generate_password_hash(new_password)
         email = session['otp_verified_email']
 
         conn = get_db_connection()
         cur = conn.cursor()
-        cur.execute("UPDATE users SET password=%s WHERE email=%s", (hashed, email))
+        cur.execute("UPDATE users SET password=%s WHERE email=%s", (new_password, email))
         conn.commit()
         cur.close()
         conn.close()
@@ -212,6 +364,13 @@ def create_account():
         cursor.close()
         conn.close()
 
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        if not new_password:
+            return "❌ Password required", 400
+        if new_password != confirm_password:
+            return "❌ Passwords do not match", 400
+
         user = {
             "fullName": request.form.get("fullname"),
             "age": request.form.get("age"),
@@ -235,7 +394,7 @@ def create_account():
             "resAddr": request.form.get("residential_address"),
             "officeAddr": request.form.get("office_address"),
             "member_id": request.form.get("member_id"),
-            "password": generate_password_hash(request.form.get("new_password")),
+            "password": new_password,
             "role": "Migrant Worker"
         }
 
@@ -276,4 +435,4 @@ def logout():
     return redirect(url_for("login"))
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True)
