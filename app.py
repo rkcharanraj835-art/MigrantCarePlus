@@ -9,20 +9,21 @@ import random as r
 import smtplib
 from email.message import EmailMessage
 from deep_translator import GoogleTranslator
+import os  # 👈 Added for env vars
 
 app = Flask(__name__)
-app.secret_key = "supersecretkey"  # ⚠️ Use environment variable in production
+app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")  # 👈 Now from env
 
-# ---------------- MySQL config ----------------
-db_config = {
-    "host": "localhost",
-    "user": "root",
-    "password": "",
-    "database": "MigrantCarePlus"
-}
-
+# ---------------- MySQL config (NOW FROM ENV VARS) ----------------
 def get_db_connection():
-    return mysql.connector.connect(**db_config)
+    return mysql.connector.connect(
+        host=os.getenv("DB_HOST", "localhost"),
+        user=os.getenv("DB_USER", "root"),
+        password=os.getenv("DB_PASSWORD", ""),
+        database=os.getenv("DB_NAME", "MigrantCarePlus"),
+        port=int(os.getenv("DB_PORT", 3306)),
+        autocommit=True  # 👈 Auto commit saves you headaches
+    )
 
 # ---------------- Utility: send OTP ----------------
 def send_otp_email(to_mail, purpose="Verification"):
@@ -32,8 +33,9 @@ def send_otp_email(to_mail, purpose="Verification"):
 
     server = smtplib.SMTP('smtp.gmail.com', 587)
     server.starttls()
-    from_mail = 'migrantcareplus@gmail.com'
-    server.login(from_mail, 'afmi mliz abwv vuqi')  # ⚠️ Use env variable in production
+    from_mail = os.getenv("EMAIL_USER", 'migrantcareplus@gmail.com')  # 👈 From env
+    app_password = os.getenv("EMAIL_PASS", 'afmi mliz abwv vuqi')     # 👈 From env
+    server.login(from_mail, app_password)
 
     msg = EmailMessage()
     msg['Subject'] = f"{purpose} OTP"
@@ -196,13 +198,11 @@ def edit_profile():
                                (new_password, member_id))
 
         if errors:
-            conn.commit()
             cursor.execute("SELECT * FROM users WHERE member_id=%s", (member_id,))
             user = cursor.fetchone()
             cursor.close(); conn.close()
             return render_template("edit_profile.html", user=user, errors=errors)
 
-        conn.commit()
         cursor.close(); conn.close()
         return redirect(url_for("profile"))
 
@@ -291,7 +291,6 @@ def set_new_password():
         conn = get_db_connection()
         cur = conn.cursor()
         cur.execute("UPDATE users SET password=%s WHERE email=%s", (new_password, email))
-        conn.commit()
         cur.close()
         conn.close()
 
@@ -317,8 +316,9 @@ def send_registration_otp():
     try:
         server = smtplib.SMTP('smtp.gmail.com', 587)
         server.starttls()
-        from_mail = 'migrantcareplus@gmail.com'
-        server.login(from_mail, 'afmi mliz abwv vuqi')
+        from_mail = os.getenv("EMAIL_USER", 'migrantcareplus@gmail.com')
+        app_password = os.getenv("EMAIL_PASS", 'afmi mliz abwv vuqi')
+        server.login(from_mail, app_password)
         msg = EmailMessage()
         msg['Subject'] = "MigrantCare+ Registration OTP"
         msg['From'] = from_mail
@@ -410,7 +410,6 @@ def create_account():
              %(workType)s, %(workId)s, %(insuranceNo)s, %(insuranceValid)s, %(permAddr)s, %(resAddr)s,
              %(officeAddr)s, %(member_id)s, %(password)s, %(role)s)
         """, user)
-        conn.commit()
         cursor.close()
         conn.close()
 
@@ -435,4 +434,4 @@ def logout():
     return redirect(url_for("login"))
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True if os.getenv("FLASK_ENV") != "production" else False)
